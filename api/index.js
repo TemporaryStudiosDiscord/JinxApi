@@ -47,7 +47,7 @@ app.get('/api/chatapi', async (req, res) => {
 		
 		console.log(`Bearer ${process.env.CHATAPI} api is `);
 		
-        const response = await axios.post('https://api-interence.huggingface.co/models/distilgpt2', {
+        const response = await axios.post('https://api-inference.huggingface.co/v1/models/gpt2/infer', {
             inputs: "Hello, how are you today?"
         }, {
             headers: {
