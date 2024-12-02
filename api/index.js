@@ -12,52 +12,29 @@ function validateApiKey(req, res, next) {
     const apiKey = req.query.key;
     
     if (!apiKey) {
-        return res.status(401).json({ error: "API key is required" });
+        return res.status(401).json({ error: "Please provide a key." });
     }
     
     if (!validApiKeys.has(apiKey)) {
-        return res.status(403).json({ error: "Invalid API key" });
+        return res.status(403).json({ error: "Invalid key." });
     }
     
     next();
 }
 
-app.get("/api/generate-key-free", (req, res) => {
-    const apiKey = crypto.randomBytes(16).toString('hex');
+app.get("/api/generate-key", (req, res) => {
+    const apiKey = crypto.randomBytes(64).toString('hex');
     validApiKeys.add(apiKey);
     res.json({ apiKey: apiKey });
 });
-
-app.get("/api/list-keys", (req, res) => {
-    res.json({ keys: Array.from(validApiKeys) });
-});
-
-app.get("/api/revoke-key", (req, res) => {
-    const { key } = req.query;
-    if (!key) {
-        return res.status(400).json({ error: "Key parameter is required" });
-    }
-    
-    if (validApiKeys.delete(key)) {
-        res.json({ message: "API key successfully revoked" });
-    } else {
-        res.status(404).json({ error: "API key not found" });
-    }
-});
-
-app.get("/api/weather", validateApiKey, async (req, res) => {
+app.get("/api/weather", async (req, res) => {
     try {
         const { city } = req.query;
         if (!city) {
             return res.status(400).json({ error: "City parameter is required" });
         }
-        const weatherResponse = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
-            params: {
-                q: city,
-                appid: process.env.OPENWEATHER_API_KEY,
-                units: 'metric'
-            }
-        });
+
+        const weatherResponse = await axios.get(`https://wttr.in/${city}?format=j1`);
         res.json(weatherResponse.data);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch weather data" });
