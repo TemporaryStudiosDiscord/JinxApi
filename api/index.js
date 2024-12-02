@@ -45,7 +45,7 @@ app.get("/api/weather", validateApiKey, async (req, res) => {
 app.get('/api/chatapi', async (req, res) => {
     try {
 		
-		console.log(`Bearer ${process.env.CHATAPI}`);
+		console.log(`Bearer ${process.env.CHATAPI} api is `);
 		
         const response = await axios.post('https://api-interence.huggingface.co/models/distilgpt2', {
             inputs: "Hello, how are you today?"
