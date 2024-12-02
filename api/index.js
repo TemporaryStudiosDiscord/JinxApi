@@ -47,11 +47,8 @@ app.get('/api/chatapi', async (req, res) => {
 		
 		console.log('Bearer ${process.env.CHATAPI}');
 		
-        const response = await axios.post('https://huggingface.co/chat/completions', {
-            inputs: "Hello, how are you today?",
-            parameters: {
-                max_new_tokens: 250
-            }
+        const response = await axios.post('https://api-interence.huggingface.co/models/distilgpt2', {
+            inputs: "Hello, how are you today?"
         }, {
             headers: {
                 'Content-Type': 'application/json',
