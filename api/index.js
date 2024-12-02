@@ -51,13 +51,13 @@ app.get('/api/chatapi', async (req, res) => {
         }, {
             headers: {
                 'Content-Type': 'application/json',
-				'Authorization': process.env.CHATAPI
+                'Authorization': `Bearer ${process.env.CHATAPI}`
             }
         });
 
         res.json({ generated_text: response.data.generated_text });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error.response?.data || error.message);
         res.status(500).json({ error: 'An error occurred while fetching the chat response.' });
     }
 });
