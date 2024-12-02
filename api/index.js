@@ -27,7 +27,7 @@ app.get("/api/generate-key", (req, res) => {
     validApiKeys.add(apiKey);
     res.json({ apiKey: apiKey });
 });
-app.get("/api/weather", async (req, res) => {
+app.get("/api/weather", validateApiKey, async (req, res) => {
     try {
         const { city } = req.query;
         if (!city) {
@@ -38,6 +38,27 @@ app.get("/api/weather", async (req, res) => {
         res.json(weatherResponse.data);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch weather data" });
+    }
+});
+
+app.get('/api/chatapi', async (req, res) => {
+    try {
+        const response = await axios.post('https://huggingface.co/chat/completions', {
+            inputs: "Hello, how are you today?",
+            parameters: {
+                max_new_tokens: 250
+            }
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+				'Authorization': process.env.CHATAPI
+            }
+        });
+
+        res.json({ generated_text: response.data.generated_text });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'An error occurred while fetching the chat response.' });
     }
 });
 
