@@ -5,7 +5,8 @@ const crypto = require('crypto');
 const app = express();
 app.use(express.json());
 
-// In-memory storage for API keys
+require('dotenv').config();
+
 const validApiKeys = new Set();
 
 function validateApiKey(req, res, next) {
@@ -43,6 +44,9 @@ app.get("/api/weather", validateApiKey, async (req, res) => {
 
 app.get('/api/chatapi', async (req, res) => {
     try {
+		
+		console.log('Bearer ${process.env.CHATAPI}');
+		
         const response = await axios.post('https://huggingface.co/chat/completions', {
             inputs: "Hello, how are you today?",
             parameters: {
