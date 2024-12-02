@@ -15,8 +15,10 @@
   "homepage": "https://github.com/TemporaryStudiosDiscord/JinxApi#readme",
   "dependencies": {
     "@vercel/node": "^3.2.18",
+    "axios": "^1.7.8",
     "chrome-aws-lambda": "^10.1.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^4.21.1",
     "puppeteer-core": "^10.1.0",
     "vercel": "^37.6.1"
