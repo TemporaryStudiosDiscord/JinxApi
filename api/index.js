@@ -57,10 +57,17 @@ app.get('/api/chatapi', async (req, res) => {
 
         res.json({ generated_text: response.data.generated_text });
     } catch (error) {
-        console.error('Error:', error.response?.data || error.message);
+        if (error.response) {
+            console.error('Error Response Data:', error.response.data);
+            console.error('Error Status:', error.response.status);
+            console.error('Error Headers:', error.response.headers);
+        } else {
+            console.error('Error Message:', error.message);
+        }
         res.status(500).json({ error: 'An error occurred while fetching the chat response.' });
     }
 });
+
 
 app.get("/api/random-quote", validateApiKey, async (req, res) => {
     try {
