@@ -3,15 +3,49 @@ const axios = require('axios');
 const crypto = require('crypto');
 
 const app = express();
-
 app.use(express.json());
 
-app.get("/api/generate-key", (req, res) => {
+// In-memory storage for API keys
+const validApiKeys = new Set();
+
+function validateApiKey(req, res, next) {
+    const apiKey = req.query.key;
+    
+    if (!apiKey) {
+        return res.status(401).json({ error: "API key is required" });
+    }
+    
+    if (!validApiKeys.has(apiKey)) {
+        return res.status(403).json({ error: "Invalid API key" });
+    }
+    
+    next();
+}
+
+app.get("/api/generate-key-free", (req, res) => {
     const apiKey = crypto.randomBytes(16).toString('hex');
+    validApiKeys.add(apiKey);
     res.json({ apiKey: apiKey });
 });
 
-app.get("/api/weather", async (req, res) => {
+app.get("/api/list-keys", (req, res) => {
+    res.json({ keys: Array.from(validApiKeys) });
+});
+
+app.get("/api/revoke-key", (req, res) => {
+    const { key } = req.query;
+    if (!key) {
+        return res.status(400).json({ error: "Key parameter is required" });
+    }
+    
+    if (validApiKeys.delete(key)) {
+        res.json({ message: "API key successfully revoked" });
+    } else {
+        res.status(404).json({ error: "API key not found" });
+    }
+});
+
+app.get("/api/weather", validateApiKey, async (req, res) => {
     try {
         const { city } = req.query;
         if (!city) {
@@ -30,7 +64,7 @@ app.get("/api/weather", async (req, res) => {
     }
 });
 
-app.get("/api/random-quote", async (req, res) => {
+app.get("/api/random-quote", validateApiKey, async (req, res) => {
     try {
         const response = await axios.get('https://api.quotable.io/random');
         res.json(response.data);
@@ -39,7 +73,7 @@ app.get("/api/random-quote", async (req, res) => {
     }
 });
 
-app.get("/api/github-user", async (req, res) => {
+app.get("/api/github-user", validateApiKey, async (req, res) => {
     const { username } = req.query;
     if (!username) {
         return res.status(400).json({ error: "GitHub username is required" });
@@ -52,7 +86,7 @@ app.get("/api/github-user", async (req, res) => {
     }
 });
 
-app.get("/api/currency-convert", async (req, res) => {
+app.get("/api/currency-convert", validateApiKey, async (req, res) => {
     const { from, to, amount } = req.query;
     if (!from || !to || !amount) {
         return res.status(400).json({ error: "From, to, and amount parameters are required" });
