@@ -8,7 +8,7 @@ app.use(express.json());
 require('dotenv').config();
 
 const validApiKeys = new Set();
-const tracker = new Set();
+const tracker = new Map();
 
 function validateApiKey(req, res, next) {
     const apiKey = req.query.key;
