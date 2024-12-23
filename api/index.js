@@ -8,6 +8,7 @@ app.use(express.json());
 require('dotenv').config();
 
 const validApiKeys = new Set();
+const tracker = new Set();
 
 function validateApiKey(req, res, next) {
     const apiKey = req.query.key;
@@ -28,6 +29,21 @@ app.get("/api/generate-key", (req, res) => {
     validApiKeys.add(apiKey);
     res.json({ apiKey: apiKey });
 });
+
+app.get("/api/tracker/main", (req, res) => {
+    const { action, playerName, code } = req.query;
+
+    if (action === "add" && playerName && code) {
+        tracker.set(playerName, code);
+        return res.status(200).json({ message: "Player added", tracker: Object.fromEntries(tracker) });
+    } else if (action === "get" && playerName) {
+        const playerCode = tracker.get(playerName);
+        return res.status(200).json({ code: playerCode || "OFFLINE" });
+    } else {
+        return res.status(400).json({ error: "Invalid action or missing parameters" });
+    }
+});
+
 app.get("/api/weather", validateApiKey, async (req, res) => {
     try {
         const { city } = req.query;
@@ -68,7 +84,6 @@ app.get('/api/chatapi', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching the chat response.' });
     }
 });
-
 
 app.get("/api/random-quote", validateApiKey, async (req, res) => {
     try {
