@@ -36,10 +36,13 @@ app.get("/api/tracker/main", (req, res) => {
 
         if (action === "add" && playerName && code) {
             tracker.set(playerName, code);
-            return res.status(200).json({ message: "Player added", tracker: Object.fromEntries(tracker) });
+            return res.status(200).json({ message: "SUCCESS" });
         } else if (action === "get" && playerName) {
             const playerCode = tracker.get(playerName);
             return res.status(200).json({ code: playerCode || "OFFLINE" });
+        } else if (action === "getAll" && playerName) {
+            const playerCode = tracker.get(playerName);
+            return res.status(200).json(Object.fromEntries(tracker));
         } else {
             return res.status(400).json({ error: "Invalid action or missing parameters" });
         }
