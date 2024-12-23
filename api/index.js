@@ -40,8 +40,7 @@ app.get("/api/tracker/main", (req, res) => {
         } else if (action === "get" && playerName) {
             const playerCode = tracker.get(playerName);
             return res.status(200).json({ code: playerCode || "OFFLINE" });
-        } else if (action === "getAll" && playerName) {
-            const playerCode = tracker.get(playerName);
+        } else if (action === "getAll") {
             return res.status(200).json(Object.fromEntries(tracker));
         } else {
             return res.status(400).json({ error: "Invalid action or missing parameters" });
