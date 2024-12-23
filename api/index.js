@@ -31,16 +31,21 @@ app.get("/api/generate-key", (req, res) => {
 });
 
 app.get("/api/tracker/main", (req, res) => {
-    const { action, playerName, code } = req.query;
+    try {
+        const { action, playerName, code } = req.query;
 
-    if (action === "add" && playerName && code) {
-        tracker.set(playerName, code);
-        return res.status(200).json({ message: "Player added", tracker: Object.fromEntries(tracker) });
-    } else if (action === "get" && playerName) {
-        const playerCode = tracker.get(playerName);
-        return res.status(200).json({ code: playerCode || "OFFLINE" });
-    } else {
-        return res.status(400).json({ error: "Invalid action or missing parameters" });
+        if (action === "add" && playerName && code) {
+            tracker.set(playerName, code);
+            return res.status(200).json({ message: "Player added", tracker: Object.fromEntries(tracker) });
+        } else if (action === "get" && playerName) {
+            const playerCode = tracker.get(playerName);
+            return res.status(200).json({ code: playerCode || "OFFLINE" });
+        } else {
+            return res.status(400).json({ error: "Invalid action or missing parameters" });
+        }
+    } catch (error) {
+        console.error("Error occurred:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
 });
 
